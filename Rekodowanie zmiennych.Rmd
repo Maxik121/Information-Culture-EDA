@@ -45,17 +45,17 @@ Interpretacja: Im wyższy wynik tym pozytywne współdzielenie informacji jest m
 
 Wyniki przedstawiają odpowiedzi respondentów w Skali Likerta 1-4
 
-Proact_1_R (Rzadko poszukuję informacji o zmianach i trendach zachodzących poza moją organizacją.)
+Proact_1_R (Poszukuję informacji o zmianach i trendach zachodzących poza moją organizacją.)
 
-Proact_2_R (Rzadko wykorzystuję informacje do reagowania na zmiany i wydarzenia zachodzące poza moją organizacją.)
+Proact_2_R (Wykorzystuję informacje do reagowania na zmiany i wydarzenia zachodzące poza moją organizacją.)
 
-Proact_3_R (Nie monitoruję regularnie nowych źródeł informacji i zazwyczaj reaguję z opóźnieniem na pojawiające się wyzwania.)
+Proact_3_R ( monitoruję regularnie nowych źródeł informacji i zazwyczaj reaguję z opóźnieniem na pojawiające się wyzwania.)
 
 Zmienna zagregowana:
 
 Proact_Total_R (skala ciągła przedstawiająca z-standaryzowaną średnią wyników kategori Proactiveness)
 
-Interpretacja: Aktywne poszukiwanie i wykorzystanie informacji- im wyższy wynik tym niższa proaktywność
+Interpretacja: Aktywne poszukiwanie i wykorzystanie informacji- im wyższy wynik tym wyższa proaktywność
 
 **III Integralność (Information Integrity)**
 
@@ -65,23 +65,21 @@ Interpretacja: Aktywne poszukiwanie i wykorzystanie informacji- im wyższy wynik
 
 Wyniki przedstawiają odpowiedzi respondentów w Skali Likerta 1-4
 
-Integ_1_Neg (Zdarza mi się wykorzystywać informacje w sposób, który daje mi osobiste korzyści, nawet jeśli nie służy to organizacji.)
+Integ_1 (Zdarza mi się wykorzystywać informacje w sposób, który daje mi osobiste korzyści, nawet jeśli nie służy to organizacji.)
 
-Integ_2_Neg (Przekazuję informacje w sposób wybiórczy, aby osiągnąć własne cele.)
+Integ_2 (Przekazuję informacje w sposób wybiórczy, aby osiągnąć własne cele.)
 
-Integ_3_Neg (Wstrzymuję ważne informacje, jeśli może mi to przynieść przewagę w pracy.)
+Integ_3 (Wstrzymuję ważne informacje, jeśli może mi to przynieść przewagę w pracy.)
 
 Zmienna zagregowana:
 
-Integrity_Total_Neg (skala ciągła przedstawiająca z-standaryzowaną średnią wyników kategori Information Integrity)
+Integrity_Total (skala ciągła przedstawiająca z-standaryzowaną średnią wyników kategori Information Integrity)
 
-Interpretacja: Etyczne użycie informacji i integralność- im wyższy wynik tym tym niższy poziom etycznego użycia informacji i integralności
+Interpretacja: Etyczne użycie informacji i integralność- im wyższy wynik tym tym wyższy poziom nieetyczne etycznego użycia informacji i integralności
 
 **IV Kontrola Informacji (Information Integrity)\***
 
--   **Definicja (wg Choo):** "Informacje są przekazywane pracownikom w celu zarządzania
-
--   i monitorowania ich wyników" .
+-   **Definicja (wg Choo):** "Informacje są przekazywane pracownikom w celu zarządzani i monitorowania ich wyników" .
 
 -   **Mapowanie:** Brak danych.
 
@@ -142,20 +140,30 @@ dane <- dane %>%
   rename(Integ_2_R=Cst_8) %>%
   rename(Integ_3_R=Dst_9) %>%
   rename(Sharing_Total=Av_Pass) %>%
-  rename(Proact_Total_R=ConstrB) %>%
-  rename(Integrit_Total_Neg=DestrB) %>%
+  rename(Proact_Total=ConstrB) %>%
+  rename(Integrit_Total=DestrB) %>%
   
 
-#Usunięcie pozostałych niepotrzebnych zmiennych pomiarowych
-  
-  select(-`Dst_10`, -`Cst_13`, -`Pas_14`, -`Av_15`, -`Dst_16`, -`Av_17`, -`Dst_18`, -`Cst_19`, -`Cst_20`, -`Pas_21`, -`Cst_22`, -`Dst_23`, -`Pas_24`, -`Av_25`, -`Cst_26`, -`Av_11`, -`Av_12`, -`Av_11`, -`Pas_27`, -`Pas_29`, -`Pas_31`,-`Pas_28`, -`Dst_30`) %>%
+  mutate(
+      Proact_1_R = 6 - Proact_1_R,
+      Proact_2_R = 6 - Proact_2_R,
+      Proact_3_R = 6 - Proact_3_R,
+      Integ_1_R = 6 - Integ_1_R,
+      Integ_2_R = 6 - Integ_2_R,
+      Integ_3_R = 6 - Integ_3_R
+  ) %>%
 
-#Przekształcenie zmiennych agregujących w z-standaryzowane średnie wyników poszczególncyh kategorii
+  # Usunięcie pozostałych niepotrzebnych zmiennych pomiarowych
+  select(-Dst_10, -Cst_13, -Pas_14, -Av_15, -Dst_16, -Av_17, -Dst_18, -Cst_19, -Cst_20, -Pas_21, -Cst_22, -Dst_23, -Pas_24, -Av_25, -Cst_26, -Av_11, -Av_12, -Pas_27, -Pas_29, -Pas_31, -Pas_28, -Dst_30) %>%
+
+  # Przekształcenie zmiennych agregujących w z-standaryzowane średnie
   mutate(
     Sharing_Total = (Sharing_Total - mean(Sharing_Total, na.rm = TRUE)) / sd(Sharing_Total, na.rm = TRUE),
     
-    Proact_Total_R = (Proact_Total_R - mean(Proact_Total_R, na.rm = TRUE)) / sd(Proact_Total_R, na.rm = TRUE), 
+    Proact_Total = (Proact_Total - mean(Proact_Total, na.rm = TRUE)) / sd(Proact_Total, na.rm = TRUE), 
     
-    Integrit_Total_Neg = (Integrit_Total_Neg - mean(Integrit_Total_Neg, na.rm = TRUE)) / sd(Integrit_Total_Neg, na.rm = TRUE)
+    Integrit_Total = (Integrit_Total - mean(Integrit_Total, na.rm = TRUE)) / sd(Integrit_Total, na.rm = TRUE)
   )
+View(data)
+write.csv(dane, "dane_rekodowane.csv", row.names = FALSE)
 ```

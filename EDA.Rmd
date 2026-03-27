@@ -1,0 +1,106 @@
+---
+title: "EDA"
+author: "Piotr Machyński"
+date: "2026-12-03"
+output: html_document
+---
+
+```{r}
+library(dplyr)
+library(ggplot2)
+dane <- read.csv("dane_rekodowane.csv")
+```
+
+## Przegląd zmiennych
+
+```{r}
+summary(dane)
+```
+
+## Identyfikacja i redukcja outlierów
+
+### Detekcja outlierów: Sharing Total
+
+```{r}
+ggplot(data = dane, aes(y = Sharing_Total)) +
+  geom_boxplot(fill = "lightblue", color = "darkblue", width = 0.5) +
+  theme_minimal() +
+  labs(
+    title = "Detekcja outlierów: Sharing Total",
+    y = "Wynik Z-score",
+    x = ""
+  ) +
+
+  theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
+
+```
+
+### Detekcja outlierów: Proact Total
+
+```{r}
+ggplot(data = dane, aes(y = Proact_Total)) +
+  geom_boxplot(fill = "lightgreen", color = "darkgreen", width = 0.5) +
+  theme_minimal() +
+  labs(
+    title = "Detekcja outlierów: Proact Total",
+    y = "Wynik Z-score",
+    x = ""
+  ) +
+  theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
+```
+
+### Detekcja outlierów: Integrity_Total
+
+```{r}
+ggplot(data=dane,aes(y=Integrit_Total)) + 
+  geom_boxplot(fill = "salmon", color= "darkred", width=0.5) +
+  theme_minimal() +
+  labs(
+    title="Detekcja outlierów: Integrity Total",
+    y="Wyniki Z-score",
+    x=""
+    ) +
+  theme(axis.title.x = element_blank(), axis.ticks.x = element_blank())
+```
+
+### Usunięcie outlierów
+
+Poniższy skrypt usuwa outliery, których wynik z-score wskazuję oddalenie od średniej o ponad 3 odchylenia standardowe.
+
+```{r}
+#Identyfikacja
+outliery <- dane %>%
+  filter(
+    abs(Sharing_Total) > 3 | 
+    abs(Proact_Total) > 3 | 
+    abs(Integrit_Total) > 3
+  )
+View(outliery)
+
+#Usunięcie
+
+dane <-dane %>%
+  filter(
+    abs(Sharing_Total) <= 3 & 
+    abs(Proact_Total) <= 3 & 
+    abs(Integrit_Total) <= 3
+  )
+
+#Just for sure
+glimpse(dane)
+```
+
+## Statystyki opisowe dla skal zachowań
+
+```{r}
+library(psych)
+descriptives <- dane %>%
+  select(Sharing_Total, Proact_Total, Integrit_Total) %>%
+  describe()
+  View(descriptives)
+  descriptives
+```
+
+### Wnioski
+
+#### Dzielenie się wiedzą
