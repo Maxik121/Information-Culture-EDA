@@ -140,7 +140,22 @@ dane <- dane %>%
   rename(Proact_3_R=Dst_6) %>%
   rename(Integ_1_R=Dst_7) %>%
   rename(Integ_2_R=Cst_8) %>%
-  rename(Integ_3_R=Dst_9)
+  rename(Integ_3_R=Dst_9) %>%
+  rename(Sharing_Total=Av_Pass) %>%
+  rename(Proact_Total_R=ConstrB) %>%
+  rename(Integrit_Total_Neg=DestrB) %>%
+  
 
 #Usunięcie pozostałych niepotrzebnych zmiennych pomiarowych
+  
+  select(-`Dst_10`, -`Cst_13`, -`Pas_14`, -`Av_15`, -`Dst_16`, -`Av_17`, -`Dst_18`, -`Cst_19`, -`Cst_20`, -`Pas_21`, -`Cst_22`, -`Dst_23`, -`Pas_24`, -`Av_25`, -`Cst_26`, -`Av_11`, -`Av_12`, -`Av_11`, -`Pas_27`, -`Pas_29`, -`Pas_31`,-`Pas_28`, -`Dst_30`) %>%
+
+#Przekształcenie zmiennych agregujących w z-standaryzowane średnie wyników poszczególncyh kategorii
+  mutate(
+    Sharing_Total = (Sharing_Total - mean(Sharing_Total, na.rm = TRUE)) / sd(Sharing_Total, na.rm = TRUE),
+    
+    Proact_Total_R = (Proact_Total_R - mean(Proact_Total_R, na.rm = TRUE)) / sd(Proact_Total_R, na.rm = TRUE), 
+    
+    Integrit_Total_Neg = (Integrit_Total_Neg - mean(Integrit_Total_Neg, na.rm = TRUE)) / sd(Integrit_Total_Neg, na.rm = TRUE)
+  )
 ```
