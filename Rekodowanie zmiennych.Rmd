@@ -2,7 +2,7 @@
 title: "Rekodowanie zmiennych"
 author: "Piotr Machyński"
 date: "2025-11-20"
-output: html_document
+output: rmarkdown::github_document
 ---
 
 ## Rekodowanie zmiennych
