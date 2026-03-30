@@ -11,7 +11,7 @@ library(ggplot2)
 dane <- read.csv("dane_rekodowane.csv")
 ```
 
-## Przegląd zmiennych
+# Przegląd zmiennych
 
 ```{r}
 summary(dane)
@@ -101,6 +101,172 @@ descriptives <- dane %>%
   descriptives
 ```
 
+```{r}
+ggplot(data = dane, aes(x = Sharing_Total)) +
+  geom_histogram(fill = "steelblue", color = "white", bins = 15) +
+  theme_minimal() +
+  labs(
+    title = "Rozkład zmiennej: Sharing Total",
+    x = "Wynik Z-score",
+    y = "Liczba badanych"
+  )
+```
+
+```{r}
+ggplot(data = dane, aes(x = Proact_Total)) +
+  geom_histogram(fill = "darkseagreen", color = "white", bins = 15) +
+  theme_minimal() +
+  labs(
+    title = "Rozkład zmiennej: Proact Total (Odwrócone)",
+    x = "Wynik Z-score",
+    y = "Liczba badanych"
+  )
+```
+
+```{r}
+ggplot(data = dane, aes(x = Integrit_Total)) +
+  geom_histogram(fill = "indianred", color = "white", bins = 15) +
+  theme_minimal() +
+  labs(
+    title = "Rozkład zmiennej: Integrity Total",
+    x = "Wynik Z-score",
+    y = "Liczba badanych"
+  )
+```
+
 ### Wnioski
 
+Dzięki zastosowanej Z-standaryzacji zmienne posiadają wysoce ujednolicone miary rozproszenia, z odchyleniem standardowym oscylującym w granicach 0.90 - 0.99. Niewielki spadek wartości odchylenia poniżej 1.00 jest bezpośrednim, oczekiwanym skutkiem oczyszczenia bazy z obserwacji odstających (outlierów), co zmniejszyło ogólną wariancję, zwłaszcza w przypadku zmiennej Integrit_Total.
+
 #### Dzielenie się wiedzą
+
+Rozkład charakteryzuje się umiarkowaną skośnością prawostronną (skew = 0.70). Potwierdza to również mediana (-0.23), która jest niższa od średniej (-0.06).
+
+Wizualizacja na histogramie wyraźnie pokazuje, że większość badanych uzyskuje wyniki poniżej przeciętnej. Oznacza to, że zachowanie polegające na dzieleniu się wiedzą nie jest w tej grupie powszechnym standardem. Istnieje jednak długi "prawy ogon" reprezentujący mniejszą, ale wyraźną grupę "super-sharerów", którzy dzielą się informacjami bardzo chętnie, zawyżając ogólną średnią grupy.
+
+#### Proaktywność
+
+Ze wszystkich trzech zmiennych zagregowanych, ta ma rozkład najbardziej zbliżony do normalnego, z jedynie małą tendencją do skośności lewostronnej (skew = -0.30). Średnia (0.01) i mediana (0.01) są sobie niemal równe.
+
+Oznacza to, że badana grupa jest pod tym względem dobrze zbalansowana i "typowa". Większość pracowników wykazuje przeciętne, stabilne zainteresowanie zdobywaniem nowych informacji. Brak tu wyraźnych skrajności – ani drastycznej pasywności, ani nadmiernej, wybijającej się proaktywności u większości badanych.
+
+#### Integralność
+
+Zmienna ta wykazuje silną skośność prawostronną (skośność = 1.20) oraz podwyższoną kurtozę. Z perspektywy organizacji to niezwykle pozytywny wynik. Ogromna większość pracowników skupia się po lewej stronie wykresu (niskie wyniki), co oznacza, że zachowania polegające na nieetycznym wykorzystywaniu informacji w badanej próbie praktycznie nie występują. Tylko pojedyncze jednostki (prawy ogon rozkładu) wykazują skłonność do manipulowania informacją dla własnych celów.
+
+## Statystyki opisowe zmiennych demograficznych
+
+```{r}
+tabela_sex <- dane %>%
+  count(Sex) %>%
+  mutate(Procent = round((n / sum(n)) * 100, 1))
+tabela_sex
+```
+
+```{r}
+ggplot(data = tabela_sex, aes(x = "", y = n, fill = Sex)) +
+  geom_bar(stat = "identity", width = 1, color = "white") +
+  coord_polar("y", start = 0) +
+  geom_text(aes(label = paste0(Procent, "%")), position = position_stack(vjust = 0.5), fontface = "bold") +
+  theme_void() +
+  labs(
+    title = "Struktura demograficzna badanej grupy",
+    subtitle = "Podział według płci",
+    fill = "Płeć"
+  )
+```
+
+### Wnioski
+
+Kobiety stanowią największą grupę w badaniu. Wskazały tak 1903 osoby, co przekłada się na 64.5% próby.
+
+Mężczyźni stanowią drugą, zauważalnie mniejszą grupę. W tej kategorii znalazło się 916 osób, czyli równo 31.0% wszystkich badanych.
+
+Niewielki odsetek badanych, liczący 132 osoby (4.5%**)**, nie udzielił odpowiedzi na to pytanie lub ich dane w tej kolumnie były niekompletne.
+
+Odsetek braków danych (4.5%) jest na akceptowalnym poziomie ponieważ nie przekracza przyjętego w naukach społecznych limitu 5%.
+
+# Testowanie hipotez
+
+## Test dwumianowy: płeć
+
+Celem jest sprawdzenie, czy w próbie odsetek kobiet (wartość „1” w zmiennej sex) różni się istotnie od 69% przyjętych dla populacji (wartość ustalona na podstawie badań Choo).
+
+```{r}
+liczba_kobiet <- sum(dane$Sex == "Female", na.rm = TRUE)
+liczba_wszystkich <- sum(!is.na(dane$Sex))
+test_plci <- binom.test(x = liczba_kobiet, n = liczba_wszystkich, p = 0.69, alternative = "two.sided")
+test_plci
+```
+
+### Wynik
+
+Odsetek kobiet w wyczyszczonej próbie badawczej wynosi 0,675 (67,5%). Jest to wartość zaledwie o 1,5 punktu procentowego niższa od teoretycznego założenia dla populacji, które wynosiło 0,69 (69%).
+
+Wynik testu wskazuje, że wartość p wynosi 0,0872. Ponieważ wartość ta jest większa niż przyjęty poziom istotności α = 0,05 (p \> 0,05), nie mamy podstaw do odrzucenia hipotezy zerowej. Oznacza to, że zaobserwowana różnica (między 67,5% a 69%) nie jest istotna statystycznie i wynika jedynie z naturalnego błędu losowego doboru próby.
+
+95-procentowy przedział ufności dla obserwowanej proporcji wynosi od 0,657 do 0,692 (od 65,7% do 69,2%). Zakładana wartość populacyjna, czyli 0,69, bezpiecznie mieści się wewnątrz tego przedziału (przy jego górnej granicy). Fakt ten dodatkowo i ostatecznie potwierdza brak istotnych statystycznie różnic.
+
+Można zatem stwierdzić, że odsetek kobiet w badanej grupie nie odbiega w sposób istotny od założenia przyjętego dla populacji (69%). Możemy zatem uznać, że pod względem struktury płci, próba badawcza jest dobrze dopasowana i reprezentatywna dla badanej populacji (przy założeniu referencyjnego poziomu 69%).
+
+## Test Dwumianowy: Age
+
+Celem testu jest sprawdzenie, czy w każdej kategorii zmiennej Age udział w próbie jest mniejszy od założonej na podstawie badań Choo wartości 30%.
+
+```{r}
+liczba_wszystkich_wiek <- sum(!is.na(dane$Age))
+
+test_wiek <-dane %>%
+  filter(!is.na(Age)) %>%      
+  count(Age) %>%               
+  rowwise() %>%                
+  mutate(
+    wynik_testu = list(binom.test(x = n, n = liczba_wszystkich_wiek, p = 0.30, alternative = "less")),
+    
+    Proporcja = round(wynik_testu$estimate, 3), 
+    p_value = round(wynik_testu$p.value, 4)     
+  ) %>%
+  select(Age, Liczba_osob = n, Proporcja, p_value)
+
+print(as.data.frame(test_wiek))
+```
+
+### Wyniki
+
+#### Grupa \<20 lat
+
+Do tej grupy należy 868 osób, czyli 29.6% respondentów.
+
+Wartość p (p=0.311) uznajemy za większą od przyjętego poziomu istotności (p \> 0.05). Oznacza to, że ta minimalna różnica jest wynikiem naturalnego błędu losowego. Z punktu widzenia statystyki, udział tej grupy nie jest istotnie mniejszy od 30%.
+
+Ponieważ obserwowany odsetek (33.9%) fizycznie przekracza zakładane 30%, wartość p dla testu jednostronnego z góry przyjmuje wartość 1. Oznacza to brak jakichkolwiek podstaw do odrzucenia hipotezy zerowej. Udział tej grupy w badaniu nie jest mniejszy od 30% (wręcz przeciwnie, dominuje w próbie).
+
+#### Grupa 20-25 lat
+
+W tej grupie znalazły się **994 osoby**, co stanowi **33.9%** całej próby. Jest to zatem najliczniejsza grupa.
+
+Ponieważ obserwowany odsetek (33.9%) fizycznie przekracza zakładane 30%, wartość p dla testu jednostronnego z góry przyjmuje wartość 1. Oznacza to brak jakichkolwiek podstaw do odrzucenia hipotezy zerowej. Udział tej grupy w badaniu nie jest mniejszy od 30% (wręcz przeciwnie, dominuje w próbie).
+
+#### Grupa 25-30 lat
+
+Grupę tę reprezentuje **650 osób**, co daje proporcję na poziomie **22.1%**.
+
+Wartość p wynosząca 0 (w rzeczywistości p \< 0.001) stanowi twardy dowód statystyczny na odrzucenie hipotezy zerowej. Udział osób w wieku 25-30 lat w Twojej próbie badawczej jest **istotnie statystycznie mniejszy** od zakładanego progu 30%.
+
+#### Grupa \>30 lat
+
+Najstarsi respondenci stanowią najmniejszą grupę w zestawieniu – to zaledwie **424 osoby (14.4%)**.
+
+Podobnie jak w poprzednim przypadku, bardzo niska wartość p (p \< 0.001) potwierdza, że udział tej grupy jest **istotnie statystycznie mniejszy** od założonych 30%.
+
+### Wniosek ogólny
+
+Próba badawcza charakteryzuje się wyraźną nadreprezentacją młodszych pracowników, ponieważ osoby do 25. roku życia stanowią łącznie ponad 63% badanych i spełniają próg 30%. Z kolei pracownicy powyżej 25. roku życia są w tej próbie istotnie statystycznie niedoreprezentowani w stosunku do oczekiwanego progu, ponieważ żadna z tych grup nie osiąga 30%.
+
+# Testy zależności
+
+## Zależność między deklarowaną płcią respondentów a stanowiskiem kierowniczym- analiza wielowarstwowa
+
+Celem jest sprawdzenie czy zależność między zmienną sex, a pełnieniem funkcji kierowniczej (Function) utrzymuje się w różnych grupach wiekowych.
+
+## Zależność liniowa między negatywnymi emocjami a wszystkimi zachowaniami - macierz korelacji
