@@ -1,8 +1,14 @@
 ---
-title: "EDA"
+title: "Eksploracyjna Analiza Danych (EDA)"
 author: "Piotr Machyński"
 date: "2026-12-03"
-output: html_document
+output: 
+  html_document:
+    theme: flatly 
+    highlight: tango       
+    toc: true              
+    toc_float: true        
+    code_folding: show     
 ---
 
 ```{r}
@@ -269,4 +275,117 @@ Próba badawcza charakteryzuje się wyraźną nadreprezentacją młodszych praco
 
 Celem jest sprawdzenie czy zależność między zmienną sex, a pełnieniem funkcji kierowniczej (Function) utrzymuje się w różnych grupach wiekowych.
 
+```{r}
+kategorie_wiekowe <- na.omit(unique(dane$Age))
+for(wiek in kategorie_wiekowe) {
+  
+  cat("\n======================================================\n")
+  cat("WARSTWA (LAYER) - WIEK:", wiek, "\n")
+  cat("======================================================\n")
+  
+  dane_warstwa <- dane %>% filter(Age == wiek)
+  tabela <- table(dane_warstwa$Sex, dane_warstwa$Function)
+  cat("\n--- 1. Liczebności obserwowane (Observed) ---\n")
+  print(tabela)
+  
+  #Test chi kwadrat
+  test_chi <- chisq.test(tabela, correct = FALSE)
+  cat("\n--- 2. Liczebności oczekiwane (Expected) ---\n")
+  print(round(test_chi$expected, 2))
+  
+  cat("\n--- 3. Reszty standaryzowane (Standardized Residuals) ---\n")
+  print(round(test_chi$stdres, 2))
+  
+  cat("\n--- 4. Statystyki testowe ---\n")
+  cat("Chi-kwadrat (χ²):", round(test_chi$statistic, 3), 
+      " |  p-value:", round(test_chi$p.value, 4), "\n")
+  
+  #Test Fishera
+  test_fisher <- fisher.test(tabela)
+  cat("Fisher's Exact Test p-value:", round(test_fisher$p.value, 4), "\n")
+  cat("Odds Ratio (OR):", round(test_fisher$estimate, 3), "\n")
+  
+  #Test phi
+  wartosc_phi <- phi(tabela, digits = 3)
+  cat("Phi / Cramér's V:", wartosc_phi, "\n\n")
+}
+  
+```
+
+### Wyniki
+
+We wszystkich analizowanych warstwach wiekowych nie odnotowano istotnej statystycznie zależności między płcią a zajmowanym stanowiskiem (wszystkie wartości $p > 0,05$). Oznacza to, że szanse na objęcie stanowiska liderskiego (Leader) w badanej grupie są zbliżone dla kobiet i mężczyzn, niezależnie od tego, do jakiego pokolenia należą pracownicy.
+
+#### Grupa 20-25 lat
+
+Jest to jedyna grupa wiekowa, w której wynik zbliżył się do granicy istotności statystycznej ($p = 0,066$ dla testu $\chi^2$; $p = 0,073$ dla testu Fishera). Mamy tu do czynienia z tzw. tendencją statystyczną.
+
+Reszty standaryzowane dla mężczyzn na stanowisku lidera wyniosły $1,84$, a dla kobiet $-1,84$. Chociaż mężczyźni minimalnie częściej zajmowali tu kierownicze stanowiska, niż wynikałoby to z rozkładu teoretycznego, wartości te nie przekroczyły krytycznego progu istotności ($\pm 1,96$).
+
+Siła tego zjawiska jest znikoma (Phi = 0,059), co potwierdza brak praktycznego znaczenia tej różnicy.
+
+#### Pozostałe grupy wiekowe
+
+W pozostałych przedziałach wiekowych wyniki testów jednoznacznie wskazują na absolutny brak powiązania płci ze stanowiskiem:
+
+| Grupa wiekowa | Wynik                                                   |
+|---------------|---------------------------------------------------------|
+| \<20 lat      | $p = 0,598$; siła związku Phi = 0,019 (brak zależności) |
+| 25-30 lat     | $p = 0,215$; siła związku Phi = 0,050 (brak zależności) |
+| \>30 lat      | $p = 0,328$; siła związku Phi = 0,049 (brak zależności  |
+
+We wszystkich tych warstwach reszty standaryzowane oscylują blisko zera (od $|0,53|$ do $|1,24|$), co oznacza, że obserwowane liczebności kobiet i mężczyzn na stanowiskach kierowniczych i specjalistycznych niemal idealnie pokrywają się z tym, czego oczekiwalibyśmy przy pełnym równouprawnieniu.
+
 ## Zależność liniowa między negatywnymi emocjami a wszystkimi zachowaniami - macierz korelacji
+
+```{r}
+
+library(corrplot)
+
+dane_korelacje <- dane %>%
+  select(AnxEm, DejEm, AngerEm, Sharing_Total, Proact_Total, Integrit_Total)
+
+macierz_korelacji <- corr.test(dane_korelacje, 
+                               use = "pairwise", 
+                               method = "pearson", 
+                               adjust = "none")
+
+
+cat("\n--- 1. WSPÓŁCZYNNIKI KORELACJI (r Pearsona) ---\n")
+print(round(macierz_korelacji$r, 3))
+
+cat("\n--- 2. ISTOTNOŚĆ STATYSTYCZNA (wartości p) ---\n")
+print(round(macierz_korelacji$p, 4))
+
+# Korelogram
+corrplot(macierz_korelacji$r, 
+         p.mat = macierz_korelacji$p, 
+         sig.level = 0.05, 
+         insig = "blank",       
+         method = "color", 
+         addCoef.col = "black",  
+         number.cex = 0.8,       
+         tl.col = "black",       
+         tl.srt = 45,            
+         diag = FALSE,           
+         title = "Macierz Korelacji: Emocje Negatywne a Zachowania",
+         mar = c(0,0,2,0))      
+```
+
+### **Negatywne emocje a współdzielenie informacji (Sharing_Total)** 
+
+Analiza wykazała istnienie umiarkowanych oraz silnych korelacji dodatnich między wszystkimi badanymi negatywnymi emocjami a gotowością do dzielenia się informacją. Najsilniejszy związek odnotowano dla przygnębienia (r = 0,525), a w dalszej kolejności dla lęku (r = 0,490) oraz złości (r = 0,444).
+
+Uzyskany wynik może wydawać się na pierwszy rzut oka nieintuicyjny, jednak znajduje głębokie uzasadnienie w psychologii pracy. Wskazuje on, że wzrost negatywnych emocji w organizacji nie "zamyka" pracowników na komunikację, lecz wręcz przeciwnie – intensyfikuje wymianę informacji. Zjawisko to można interpretować jako mechanizm radzenia sobie ze stresem (tzw. *coping*). W obliczu lęku czy złości pracownicy częściej angażują się w nieformalną komunikację, poszukują wsparcia społecznego lub wymieniają się ostrzeżeniami, co w danych ankietowych zostało zarejestrowane jako podwyższony poziom zmiennej `Sharing_Total`.
+
+### **Negatywne emocje a brak integralności / zachowania destrukcyjne (Integrit_Total)** 
+
+W tej kategorii odnotowano najsilniejsze powiązania w całym modelu badawczym. Badanie potwierdziło istnienie silnych, dodatnich korelacji pomiędzy odczuwaniem negatywnych emocji a nieetycznym wykorzystywaniem informacji. Zdecydowanie najsilniejszym predyktorem zachowań destrukcyjnych okazała się złość (r = 0,609), a następnie lęk (r = 0,553) i przygnębienie (r = 0,543).
+
+Pamiętając, że wyższy wynik w tej skali oznacza nasilenie zachowań negatywnych, rezultaty te wprost dowodzą, że toksyczne emocje w miejscu pracy stanowią główny wyzwalacz patologii informacyjnych. Pracownicy odczuwający silną złość lub niepokój są znacznie bardziej skłonni do zatajania ważnych danych, manipulowania nimi oraz wykorzystywania ich wyłącznie do własnych, osobistych korzyści (co wpisuje się w klasyczny model zachowań kontrproduktywnych – CWB).
+
+### **Negatywne emocje a proaktywność (Proact_Total)** 
+
+Zgodnie z przyjętą interpretacją (wyższy wynik oznacza wyższą proaktywność), wyniki analizy wskazują na spójne korelacje ujemne o sile od słabej do umiarkowanej. Oznacza to, że negatywne emocje istotnie hamują i osłabiają proaktywne poszukiwanie nowych informacji. Najsilniejszy efekt paraliżujący wykazuje lęk (r = -0,325), następnie przygnębienie (r = -0,292) oraz złość (r = -0,205).
+
+Wyniki te sugerują, że w środowisku zdominowanym przez niepokój, zasoby poznawcze pracowników ulegają znacznemu wyczerpaniu. Zamiast aktywnie monitorować otoczenie i poszukiwać innowacji informacyjnych, pracownicy przyjmują postawę pasywną i unikową, skupiając się na przetrwaniu w niesprzyjających warunkach.
