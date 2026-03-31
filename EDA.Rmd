@@ -2,13 +2,7 @@
 title: "Eksploracyjna Analiza Danych (EDA)"
 author: "Piotr Machyński"
 date: "2026-12-03"
-output: 
-  html_document:
-    theme: flatly 
-    highlight: tango       
-    toc: true              
-    toc_float: true        
-    code_folding: show     
+output: github_document
 ---
 
 ```{r}
