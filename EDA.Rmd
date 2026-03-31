@@ -366,19 +366,19 @@ corrplot(macierz_korelacji$r,
          mar = c(0,0,2,0))      
 ```
 
-### **Negatywne emocje a współdzielenie informacji (Sharing_Total)** 
+### **Negatywne emocje a współdzielenie informacji (Sharing_Total)**
 
 Analiza wykazała istnienie umiarkowanych oraz silnych korelacji dodatnich między wszystkimi badanymi negatywnymi emocjami a gotowością do dzielenia się informacją. Najsilniejszy związek odnotowano dla przygnębienia (r = 0,525), a w dalszej kolejności dla lęku (r = 0,490) oraz złości (r = 0,444).
 
 Uzyskany wynik może wydawać się na pierwszy rzut oka nieintuicyjny, jednak znajduje głębokie uzasadnienie w psychologii pracy. Wskazuje on, że wzrost negatywnych emocji w organizacji nie "zamyka" pracowników na komunikację, lecz wręcz przeciwnie – intensyfikuje wymianę informacji. Zjawisko to można interpretować jako mechanizm radzenia sobie ze stresem (tzw. *coping*). W obliczu lęku czy złości pracownicy częściej angażują się w nieformalną komunikację, poszukują wsparcia społecznego lub wymieniają się ostrzeżeniami, co w danych ankietowych zostało zarejestrowane jako podwyższony poziom zmiennej `Sharing_Total`.
 
-### **Negatywne emocje a brak integralności / zachowania destrukcyjne (Integrit_Total)** 
+### **Negatywne emocje a brak integralności / zachowania destrukcyjne (Integrit_Total)**
 
 W tej kategorii odnotowano najsilniejsze powiązania w całym modelu badawczym. Badanie potwierdziło istnienie silnych, dodatnich korelacji pomiędzy odczuwaniem negatywnych emocji a nieetycznym wykorzystywaniem informacji. Zdecydowanie najsilniejszym predyktorem zachowań destrukcyjnych okazała się złość (r = 0,609), a następnie lęk (r = 0,553) i przygnębienie (r = 0,543).
 
 Pamiętając, że wyższy wynik w tej skali oznacza nasilenie zachowań negatywnych, rezultaty te wprost dowodzą, że toksyczne emocje w miejscu pracy stanowią główny wyzwalacz patologii informacyjnych. Pracownicy odczuwający silną złość lub niepokój są znacznie bardziej skłonni do zatajania ważnych danych, manipulowania nimi oraz wykorzystywania ich wyłącznie do własnych, osobistych korzyści (co wpisuje się w klasyczny model zachowań kontrproduktywnych – CWB).
 
-### **Negatywne emocje a proaktywność (Proact_Total)** 
+### **Negatywne emocje a proaktywność (Proact_Total)**
 
 Zgodnie z przyjętą interpretacją (wyższy wynik oznacza wyższą proaktywność), wyniki analizy wskazują na spójne korelacje ujemne o sile od słabej do umiarkowanej. Oznacza to, że negatywne emocje istotnie hamują i osłabiają proaktywne poszukiwanie nowych informacji. Najsilniejszy efekt paraliżujący wykazuje lęk (r = -0,325), następnie przygnębienie (r = -0,292) oraz złość (r = -0,205).
 

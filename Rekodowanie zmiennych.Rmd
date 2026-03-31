@@ -104,7 +104,6 @@ library(dplyr)
 #usunięcie zmiennej l.p
 dane <- worab_dataset %>%
 select(-`L.p.`)
-View(dane)
 ```
 
 ```{r}
@@ -164,6 +163,5 @@ dane <- dane %>%
     
     Integrit_Total = (Integrit_Total - mean(Integrit_Total, na.rm = TRUE)) / sd(Integrit_Total, na.rm = TRUE)
   )
-View(data)
 write.csv(dane, "dane_rekodowane.csv", row.names = FALSE)
 ```

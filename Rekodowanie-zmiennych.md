@@ -1,0 +1,209 @@
+Rekodowanie zmiennych
+================
+Piotr Machyński
+2025-11-20
+
+## Rekodowanie zmiennych
+
+Emocje:
+
+AnxEm - *Anxiety Emotion* → lęk / niepokój
+
+HappEm - *Happiness Emotion* → radość / szczęście
+
+DejEm - *Dejection Emotion* → przygnębienie, smutek, poczucie rezygnacji
+
+AngerEm - *Anger Emotion* → złość / gniew
+
+**I Dzielenie się informacją (Information Sharing)**
+
+- **Definicja (wg Choo):** “Gotowość do dostarczania innym informacji w
+  odpowiedni i oparty na współpracy sposób” .
+
+- **Mapowanie:** “Zachowania Konstruktywne” (Share) ze wskaźnikiem
+  “Dzielenia się informacją”
+
+Wyniki przedstawiają odpowiedzi respondentów w Skali Likerta 1-4
+
+Share1 (Często wymieniam informacje z osobami, z którymi regularnie
+współpracuję.)
+
+Share_2 (Często wymieniam informacje z obywatelami, klientami lub
+kontrahentami spoza mojej organizacji.)
+
+Share_3 (Regularnie informuję innych o zmianach, które mogą wpłynąćna
+ich pracę.)
+
+Zmienna zagregowana:
+
+Sharing_Total (skala ciągła przedstawiająca z-standaryzowaną średnią
+wyników kategori Information Sharing)
+
+Interpretacja: Im wyższy wynik tym pozytywne współdzielenie informacji
+jest mocniejsze
+
+**II Proaktywność (Proactiveness)**
+
+- **Definicja (wg Choo):** “Aktywne zainteresowanie zdobywaniem i
+  stosowaniem nowych informacji w celu szybkiego reagowania na zmiany” i
+  promowania innowacji.
+
+- **Mapowanie:** “Zachowania Unikowo-Pasywne” odpowiadają
+  **odwrotności** proaktywności informacyjnej (tzn. wysoki wynik w
+  Proact oznacza *niską* proaktywność).
+
+Wyniki przedstawiają odpowiedzi respondentów w Skali Likerta 1-4
+
+Proact_1_R (Poszukuję informacji o zmianach i trendach zachodzących poza
+moją organizacją.)
+
+Proact_2_R (Wykorzystuję informacje do reagowania na zmiany i wydarzenia
+zachodzące poza moją organizacją.)
+
+Proact_3_R ( monitoruję regularnie nowych źródeł informacji i zazwyczaj
+reaguję z opóźnieniem na pojawiające się wyzwania.)
+
+Zmienna zagregowana:
+
+Proact_Total_R (skala ciągła przedstawiająca z-standaryzowaną średnią
+wyników kategori Proactiveness)
+
+Interpretacja: Aktywne poszukiwanie i wykorzystanie informacji- im
+wyższy wynik tym wyższa proaktywność
+
+**III Integralność (Information Integrity)**
+
+- **Definicja (wg Choo):** “Wykorzystywanie informacji w sposób godny
+  zaufania i zgodny z zasadami” . W badaniu Choo (2008) mierzono ten
+  wymiar poprzez zachowania negatywne, np. “wykorzystywanie informacji
+  dla osobistych korzyści” .
+
+- **Mapowanie:** “Zachowania Destrukcyjne” (Integ) oznaczają **brak**
+  integralności informacyjnej.
+
+Wyniki przedstawiają odpowiedzi respondentów w Skali Likerta 1-4
+
+Integ_1 (Zdarza mi się wykorzystywać informacje w sposób, który daje mi
+osobiste korzyści, nawet jeśli nie służy to organizacji.)
+
+Integ_2 (Przekazuję informacje w sposób wybiórczy, aby osiągnąć własne
+cele.)
+
+Integ_3 (Wstrzymuję ważne informacje, jeśli może mi to przynieść
+przewagę w pracy.)
+
+Zmienna zagregowana:
+
+Integrity_Total (skala ciągła przedstawiająca z-standaryzowaną średnią
+wyników kategori Information Integrity)
+
+Interpretacja: Etyczne użycie informacji i integralność- im wyższy wynik
+tym tym wyższy poziom nieetyczne etycznego użycia informacji i
+integralności
+
+**IV Kontrola Informacji (Information Integrity)\***
+
+- **Definicja (wg Choo):** “Informacje są przekazywane pracownikom w
+  celu zarządzani i monitorowania ich wyników” .
+
+- **Mapowanie:** Brak danych.
+
+Brak zmiennych
+
+**V Nieformalność Informacji (Information Integrity)\***
+
+- **Definicja (wg Choo):** “Skłonność do korzystania z nieformalnych
+
+- źródeł informacji i ufania im bardziej niż informacjom
+  instytucjonalnym” .
+
+- **Mapowanie:** Brak danych.
+
+Brak zmiennych
+
+\*Ważna informacja- z uwagi na brak zmiennych z zakresu Kontroli
+Informacji i Nieformalności informacji, z tabeli usunięte zostały
+kolumny odpowiadające odpowiedziom z tych kategorii wraz z ich zmiennymi
+zagregowanymi.
+
+``` r
+worab_dataset <- read.csv("worab.csv")
+library(dplyr)
+```
+
+    ## 
+    ## Dołączanie pakietu: 'dplyr'
+
+    ## Następujące obiekty zostały zakryte z 'package:stats':
+    ## 
+    ##     filter, lag
+
+    ## Następujące obiekty zostały zakryte z 'package:base':
+    ## 
+    ##     intersect, setdiff, setequal, union
+
+``` r
+#usunięcie zmiennej l.p
+dane <- worab_dataset %>%
+select(-`L.p.`)
+```
+
+``` r
+#Zrekodowanie zmiennych metryczkowych
+dane <- dane %>%
+  rename(Age = Age_2) %>%
+  rename(Function = Man_nman) %>%
+  mutate(
+    Sex = case_when(
+      Sex==1~"Female",
+      Sex==0~"Men",
+    ),
+    
+    Function = case_when(
+      Function==1~"Leader",
+      Function==0~"Employe",
+    ),
+    Age = case_when(
+      Age==1~"<20 y.",
+      Age==2~"20-25 y.",
+      Age==3~"25-30 y.",
+      Age==4~">30 y.",
+    )
+  ) %>%
+#Rekodowanie zmiennych pomiarowych
+  rename(Share_1 = Av_1) %>%
+  rename(Share_2= Dst_2) %>%
+  rename(Share_3=Cst_3) %>%
+  rename(Proact_1_R= Av_4) %>%
+  rename(Proact_2_R=Av_5) %>%
+  rename(Proact_3_R=Dst_6) %>%
+  rename(Integ_1_R=Dst_7) %>%
+  rename(Integ_2_R=Cst_8) %>%
+  rename(Integ_3_R=Dst_9) %>%
+  rename(Sharing_Total=Av_Pass) %>%
+  rename(Proact_Total=ConstrB) %>%
+  rename(Integrit_Total=DestrB) %>%
+  
+
+  mutate(
+      Proact_1_R = 6 - Proact_1_R,
+      Proact_2_R = 6 - Proact_2_R,
+      Proact_3_R = 6 - Proact_3_R,
+      Integ_1_R = 6 - Integ_1_R,
+      Integ_2_R = 6 - Integ_2_R,
+      Integ_3_R = 6 - Integ_3_R
+  ) %>%
+
+  # Usunięcie pozostałych niepotrzebnych zmiennych pomiarowych
+  select(-Dst_10, -Cst_13, -Pas_14, -Av_15, -Dst_16, -Av_17, -Dst_18, -Cst_19, -Cst_20, -Pas_21, -Cst_22, -Dst_23, -Pas_24, -Av_25, -Cst_26, -Av_11, -Av_12, -Pas_27, -Pas_29, -Pas_31, -Pas_28, -Dst_30) %>%
+
+  # Przekształcenie zmiennych agregujących w z-standaryzowane średnie
+  mutate(
+    Sharing_Total = (Sharing_Total - mean(Sharing_Total, na.rm = TRUE)) / sd(Sharing_Total, na.rm = TRUE),
+    
+    Proact_Total = (Proact_Total - mean(Proact_Total, na.rm = TRUE)) / sd(Proact_Total, na.rm = TRUE), 
+    
+    Integrit_Total = (Integrit_Total - mean(Integrit_Total, na.rm = TRUE)) / sd(Integrit_Total, na.rm = TRUE)
+  )
+write.csv(dane, "dane_rekodowane.csv", row.names = FALSE)
+```
